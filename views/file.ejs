@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= filename %> | File Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-glow {
+        box-shadow: 0 0 25px rgba(66, 153, 225, 0.3);
+        transition: all 0.4s ease;
+      }
+
+      .card-glow:hover {
+        box-shadow: 0 0 35px rgba(66, 153, 225, 0.5);
+      }
+
+      .content-box {
+        background: rgba(24, 24, 27, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .content-box:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 7px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+      }
+
+      .btn-primary:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        20% {
+          transform: scale(25, 25);
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(40, 40);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.6s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .floating {
+        animation: floating 6s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translate(0, 0px);
+        }
+        50% {
+          transform: translate(0, 15px);
+        }
+        100% {
+          transform: translate(0, -0px);
+        }
+      }
+
+      .bg-pattern {
+        background-image: radial-gradient(
+            circle at 25px 25px,
+            rgba(255, 255, 255, 0.05) 2%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 75px 75px,
+            rgba(255, 255, 255, 0.05) 2%,
+            transparent 40%
+          );
+        background-size: 100px 100px;
+      }
+
+      .file-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 60px;
+        height: 80px;
+        border-radius: 8px 12px 12px 8px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .file-icon::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-bottom-left-radius: 8px;
+      }
+
+      .file-icon::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 20px 20px 0;
+        border-color: transparent #1a1a2e transparent transparent;
+      }
+
+      .text-highlight {
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(59, 130, 246, 0.2) 50%,
+          transparent 100%
+        );
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      .scrollbar-custom {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(59, 130, 246, 0.5) rgba(39, 39, 42, 0.3);
+      }
+
+      .scrollbar-custom::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .scrollbar-custom::-webkit-scrollbar-track {
+        background: rgba(39, 39, 42, 0.3);
+        border-radius: 10px;
+      }
+
+      .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: rgba(59, 130, 246, 0.5);
+        border-radius: 10px;
+      }
+
+      .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        background: rgba(59, 130, 246, 0.7);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-6 bg-pattern">
+    <!-- Floating Elements -->
+    <div
+      class="floating absolute top-10 left-10 w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-10 blur-xl"
+    ></div>
+    <div
+      class="floating absolute top-1/4 right-20 w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500 opacity-10 blur-xl"
+      style="animation-delay: 1s"
+    ></div>
+    <div
+      class="floating absolute bottom-20 left-1/4 w-24 h-24 rounded-full bg-gradient-to-r from-green-400 to-blue-500 opacity-10 blur-xl"
+      style="animation-delay: 2s"
+    ></div>
+
+    <div
+      class="bg-zinc-800/80 rounded-3xl shadow-2xl p-8 max-w-3xl w-full space-y-8 card-glow fade-in"
+    >
+      <!-- Header with File Icon -->
+      <div class="flex flex-col items-center space-y-4">
+        <div class="file-icon">
+          <i class="fas fa-file text-white text-2xl"></i>
+        </div>
+        <div class="text-center">
+          <h1
+            class="text-3xl sm:text-4xl font-bold gradient-text break-words slide-in"
+          >
+            <%= filename %>
+          </h1>
+          <p class="text-zinc-400 mt-2 text-sm">
+            File created on
+            <span class="text-highlight"
+              ><%= new Date().toLocaleDateString() %></span
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- File Content -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-zinc-300 flex items-center">
+            <i class="fas fa-align-left mr-2 text-blue-400"></i> Content Preview
+          </h2>
+          <div class="text-zinc-500 text-sm flex items-center">
+            <i class="fas fa-clock mr-1"></i> Last viewed just now
+          </div>
+        </div>
+        <div
+          class="content-box p-6 rounded-xl text-zinc-300 whitespace-pre-wrap overflow-x-auto max-h-[60vh] scrollbar-custom"
+        >
+          <%= filedata %>
+        </div>
+        <div class="flex justify-between text-sm text-zinc-500">
+          <div class="flex items-center">
+            <i class="fas fa-text-height mr-1"></i>
+            <span><%= filedata ? filedata.length : 0 %> characters</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-code mr-1"></i>
+            <span>Plain Text</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+        <a
+          href="/"
+          class="btn-primary text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-800 text-center flex items-center justify-center"
+        >
+          <i class="fas fa-arrow-left mr-2"></i> Back to Home
+        </a>
+        <a
+          href="/edit/<%= filename %>"
+          class="bg-amber-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-amber-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-800 text-center flex items-center justify-center"
+        >
+          <i class="fas fa-edit mr-2"></i> Edit File
+        </a>
+        <button
+          onclick="copyToClipboard()"
+          class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-800 text-center flex items-center justify-center"
+        >
+          <i class="fas fa-copy mr-2"></i> Copy Content
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed bottom-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-16 transition-transform duration-300 opacity-0 flex items-center"
+    >
+      <i class="fas fa-check-circle mr-2"></i>
+      <span>Content copied to clipboard!</span>
+    </div>
+
+    <script>
+      // Copy content to clipboard
+      function copyToClipboard() {
+        const content = `<%= filedata %>`;
+        navigator.clipboard.writeText(content).then(() => {
+          showToast();
+        });
+      }
+
+      // Show toast notification
+      function showToast() {
+        const toast = document.getElementById("toast");
+        toast.classList.remove("translate-y-16", "opacity-0");
+        toast.classList.add("translate-y-0", "opacity-100");
+
+        setTimeout(() => {
+          toast.classList.remove("translate-y-0", "opacity-100");
+          toast.classList.add("translate-y-16", "opacity-0");
+        }, 3000);
+      }
+
+      // Add some visual effects to the content box
+      document.addEventListener("DOMContentLoaded", function () {
+        const contentBox = document.querySelector(".content-box");
+
+        // Add subtle highlight effect when content is focused
+        contentBox.addEventListener("click", function () {
+          this.style.borderColor = "rgba(59, 130, 246, 0.7)";
+          this.style.boxShadow = "0 0 20px rgba(59, 130, 246, 0.3)";
+
+          setTimeout(() => {
+            this.style.borderColor = "rgba(75, 85, 99, 0.3)";
+            this.style.boxShadow = "none";
+          }, 2000);
+        });
+      });
+    </script>
+  </body>
+</html>

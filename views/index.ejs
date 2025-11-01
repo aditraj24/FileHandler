@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-glow {
+        box-shadow: 0 0 15px rgba(66, 153, 225, 0.3);
+        transition: all 0.4s ease;
+      }
+
+      .card-glow:hover {
+        box-shadow: 0 0 25px rgba(66, 153, 225, 0.6);
+        transform: translateY(-5px);
+      }
+
+      .form-input {
+        background: rgba(39, 39, 42, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        background: rgba(39, 39, 42, 0.9);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 7px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+      }
+
+      .btn-primary:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        20% {
+          transform: scale(25, 25);
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(40, 40);
+        }
+      }
+
+      .file-card {
+        background: linear-gradient(
+          145deg,
+          rgba(39, 39, 42, 0.8),
+          rgba(24, 24, 27, 0.8)
+        );
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(75, 85, 99, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .file-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.7s;
+      }
+
+      .file-card:hover::before {
+        left: 100%;
+      }
+
+      .file-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .action-btn {
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        border-radius: 6px;
+      }
+
+      .view-btn:hover {
+        background: rgba(59, 130, 246, 0.2);
+      }
+
+      .edit-btn:hover {
+        background: rgba(245, 158, 11, 0.2);
+      }
+
+      .delete-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+
+      .floating {
+        animation: floating 6s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translate(0, 0px);
+        }
+        50% {
+          transform: translate(0, 15px);
+        }
+        100% {
+          transform: translate(0, -0px);
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(66, 153, 225, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.6s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .bg-pattern {
+        background-image: radial-gradient(
+            circle at 25px 25px,
+            rgba(255, 255, 255, 0.05) 2%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 75px 75px,
+            rgba(255, 255, 255, 0.05) 2%,
+            transparent 40%
+          );
+        background-size: 100px 100px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 sm:p-8 bg-pattern">
+    <!-- Floating Elements -->
+    <div
+      class="floating absolute top-10 left-10 w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-10 blur-xl"
+    ></div>
+    <div
+      class="floating absolute top-1/4 right-20 w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500 opacity-10 blur-xl"
+      style="animation-delay: 1s"
+    ></div>
+    <div
+      class="floating absolute bottom-20 left-1/4 w-24 h-24 rounded-full bg-gradient-to-r from-green-400 to-blue-500 opacity-10 blur-xl"
+      style="animation-delay: 2s"
+    ></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+      <!-- Create File Form -->
+      <div
+        class="bg-zinc-800/80 p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg mx-auto card-glow fade-in"
+      >
+        <div class="text-center mb-2">
+          <i class="fas fa-file-circle-plus text-5xl gradient-text mb-4"></i>
+        </div>
+        <h1
+          class="text-3xl sm:text-4xl font-bold mb-8 text-center gradient-text"
+        >
+          Create a New File
+        </h1>
+
+        <form action="/create" method="POST" class="flex flex-col gap-5">
+          <div class="relative">
+            <i class="fas fa-heading absolute left-3 top-4 text-zinc-400"></i>
+            <input
+              type="text"
+              name="title"
+              placeholder="File Title"
+              class="border pl-10 p-3 rounded-xl form-input w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-blue-500"
+              required
+            />
+          </div>
+          <div class="relative">
+            <i
+              class="fas fa-file-lines absolute left-3 top-4 text-zinc-400"
+            ></i>
+            <textarea
+              name="details"
+              placeholder="File Details"
+              rows="4"
+              class="border pl-10 p-3 rounded-xl form-input w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-white"
+              required
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="btn-primary text-white p-3 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-800 transition-colors duration-200 pulse"
+          >
+            <i class="fas fa-plus-circle mr-2"></i> Create File
+          </button>
+        </form>
+      </div>
+
+      <hr class="my-12 border-zinc-700/50" />
+
+      <!-- Existing Files Section -->
+      <div class="text-center mb-12">
+        <div
+          class="inline-flex items-center justify-center gap-4 bg-zinc-800/70 px-8 py-4 rounded-2xl border border-zinc-700/50 shadow-lg"
+        >
+          <!-- <i class="fas fa-folder-open text-2xl gradient-text"></i> -->
+          <h2 class="text-3xl sm:text-4xl font-bold gradient-text slide-in">
+            Existing Files
+          </h2>
+          <!-- <i class="fas fa-folder text-2xl gradient-text"></i> -->
+        </div>
+        <div
+          class="mt-4 text-zinc-400 text-sm flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-info-circle"></i>
+          <span>Manage your created files below</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% if (files.length > 0) { %> <% files.forEach(function(file, index) {
+        %>
+        <div
+          class="file-card p-6 rounded-2xl fade-in"
+          style="animation-delay: <%= index * 0.1 %>s"
+        >
+          <div class="flex items-center mb-4">
+            <i class="fas fa-file text-blue-400 mr-3 text-xl"></i>
+            <h1 class="text-xl font-semibold truncate text-blue-400">
+              <%= file %>
+            </h1>
+          </div>
+          <div class="flex flex-row items-center align-middle gap-3">
+            <a
+              href="/file/<%= file %>"
+              class="action-btn view-btn text-blue-500 hover:text-blue-400 transition-colors"
+            >
+              <i class="fas fa-eye mr-1"></i> View
+            </a>
+            <a
+              href="/edit/<%= file %>"
+              class="action-btn edit-btn text-yellow-400 hover:text-yellow-300 transition-colors"
+            >
+              <i class="fas fa-edit mr-1"></i> Edit
+            </a>
+            <form
+              action="/delete/<%= file %>"
+              method="POST"
+              onsubmit="return confirm('Are you sure you want to delete <%= file %>?');"
+              class="inline"
+            >
+              <button
+                type="submit"
+                class="action-btn delete-btn text-red-500 hover:text-red-400 transition-colors"
+              >
+                <i class="fas fa-trash mr-1"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+        <% }) %> <% } else { %>
+        <div class="text-center text-zinc-400 col-span-full py-10 fade-in">
+          <i class="fas fa-folder-open text-5xl mb-4 opacity-50"></i>
+          <p class="text-xl">No files created yet.</p>
+          <p class="mt-2">Create your first file using the form above!</p>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <script>
+      // Add staggered animation for file cards
+      document.addEventListener("DOMContentLoaded", function () {
+        const cards = document.querySelectorAll(".file-card");
+        cards.forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Add ripple effect to buttons
+        const buttons = document.querySelectorAll(".btn-primary");
+        buttons.forEach((button) => {
+          button.addEventListener("click", function (e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
+
+            const ripples = document.createElement("span");
+            ripples.style.left = `${x}px`;
+            ripples.style.top = `${y}px`;
+            this.appendChild(ripples);
+
+            setTimeout(() => {
+              ripples.remove();
+            }, 1000);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
